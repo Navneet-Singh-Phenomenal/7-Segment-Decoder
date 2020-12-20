@@ -1,0 +1,415 @@
+								  7-SEGMENT DECODER (FROM 0-F)  (0123456789AbCdEF)
+									________________________
+
+PROGECT::  WHEN SWITCH RELEASES THE IT COUNT(OR INCREMENT BY ONE)
+
+
+SOLUTION:
+
+module MY_SWITCH_RELEASE_ACTION(q,in,clk);
+  output reg [3:0] q;
+  input in;
+  input clk;
+  reg mem;
+  
+  seven_segment_display D1(out7,q);
+  
+  initial
+    begin
+      q=0;
+      mem=0;
+    end
+  
+  always@(posedge clk)
+    begin
+      mem <= in;
+      
+      if(in==0 && mem==1)
+        begin
+          q=q+1;
+          $display("q=%d, q=%h, q=%b",q,q,q);
+        end
+      else
+        q=q;
+    end
+  
+endmodule
+
+module seven_segment_display(out7,q);
+  output reg [6:0] out7;
+  input [3:0] q;
+  
+  always@(*)
+    begin
+      case(q)
+        0: out7 <= 7'h7E;                                                   // 7E input goes and shows 0 at display .SIMILARLY FOR OTHERS
+        1: out7 <= 7'h30;
+        2: out7 <= 7'h6D;
+        3: out7 <= 7'h79;
+        4: out7 <= 7'h33;
+        5: out7 <= 7'h58;
+        6: out7 <= 7'h5F;
+        7: out7 <= 7'h70;
+        8: out7 <= 7'h7F;
+        9: out7 <= 7'h7B;
+        10: out7 <= 7'h77;
+        11: out7 <= 7'h1F;
+        12: out7 <= 7'h4E;
+        13: out7 <= 7'h3D;
+        14: out7 <= 7'h4F;
+        15: out7 <= 7'h47;
+      endcase
+      
+      $display($time,"q=%d,out7=%b,out=%h",q,out7,out7);
+    end
+  
+endmodule
+  
+
+
+										TESTBENCH
+									     _______________
+
+module stimulus;
+  reg in;
+  reg clk;
+  wire [3:0] q;
+  
+  MY_SWITCH_RELEASE_ACTION DUT(q,in,clk);
+  
+  initial
+    begin
+      $dumpfile("dump.vcd");
+      $dumpvars(0);
+      
+      monitor;
+      
+      clk=0;
+      forever clk=#(5) ~clk;
+    end
+  
+  initial
+    fork
+      #(13) in=1;        #(43) in=0;                              // WE PRESS THE BUTTON
+      #(57) in=1;        #(67) in=0;					//PRESS 2ND TIME
+      #(77) in=1;        #(87) in=0;					//PRESS 3RD TIME
+      #(300) $finish;
+    join
+  
+  task monitor;
+    $monitor($time,"in=%b,q=%d",in,q);
+  endtask
+  
+endmodule
+
+
+									OUTPUT
+								     ____________
+
+# KERNEL:                    0q= 0,out7=xxxxxxx,out=xx
+# KERNEL:                    0q= 0,out7=1111110,out=7e
+# KERNEL:                    0in=x,q= 0
+# KERNEL:                   13in=1,q= 0
+# KERNEL:                   43in=0,q= 0
+# KERNEL: q= 1, q=1, q=0001
+# KERNEL:                   45q= 1,out7=1111110,out=7e
+# KERNEL:                   45q= 1,out7=0110000,out=30
+# KERNEL:                   45in=0,q= 1
+# KERNEL:                   57in=1,q= 1
+# KERNEL:                   67in=0,q= 1
+# KERNEL: q= 2, q=2, q=0010
+# KERNEL:                   75q= 2,out7=0110000,out=30
+# KERNEL:                   75q= 2,out7=1101101,out=6d
+# KERNEL:                   75in=0,q= 2
+# KERNEL:                   77in=1,q= 2
+# KERNEL:                   87in=0,q= 2
+# KERNEL: q= 3, q=3, q=0011
+# KERNEL:                   95q= 3,out7=1101101,out=6d
+# KERNEL:                   95q= 3,out7=1111001,out=79
+# KERNEL:                   95in=0,q= 3
+ 
+
+_______________________________________________________________________________________________________________________________________________________________________________
+
+
+									2-DIGIT_COUNTER( range=0-255  OR 00-FF)
+								     ______________________________________________
+
+module MY_SWITCH_RELEASE_ACTION(out0,out1,q,in,clk);
+  output reg [7:0] q;
+  output reg [6:0] out1;
+  output reg [6:0] out0;
+  input in;
+  input clk;
+  reg mem;
+  
+  seven_segment_display D0(out0,q [3:0] );
+  seven_segment_display D1(out1,q [7:4] );
+  
+  initial
+    begin
+      q=0;
+      mem=0;
+    end
+  
+  always@(posedge clk)
+    begin
+      mem <= in;
+      
+      if(in==0 && mem==1)
+        begin
+          q=q+1;
+          $display("q=%d, q=%h, q=%b",q,q,q);
+        end
+      else
+        q=q;
+    end
+  
+endmodule
+
+module seven_segment_display(out7,q);
+  output reg [6:0] out7;
+  input [3:0] q;
+  
+  always@(*)
+    begin
+      case(q)
+        0: out7 <= 7'h7E;
+        1: out7 <= 7'h30;
+        2: out7 <= 7'h6D;
+        3: out7 <= 7'h79;
+        4: out7 <= 7'h33;
+        5: out7 <= 7'h58;
+        6: out7 <= 7'h5F;
+        7: out7 <= 7'h70;
+        8: out7 <= 7'h7F;
+        9: out7 <= 7'h7B;
+        10: out7 <= 7'h77;
+        11: out7 <= 7'h1F;
+        12: out7 <= 7'h4E;
+        13: out7 <= 7'h3D;
+        14: out7 <= 7'h4F;
+        15: out7 <= 7'h47;
+      endcase
+      
+      $display($time,"q=%d,out7=%b,out=%h",q,out7,out7);
+    end
+  
+endmodule
+
+
+									TESTBENCH
+								     _______________
+
+module stimulus;
+  reg in;
+  reg clk;
+  wire [7:0] q;
+  wire [6:0] out0;
+  wire [6:0] out1;
+  
+  MY_SWITCH_RELEASE_ACTION DUT(out0,out1,q,in,clk);
+  
+  initial
+    begin
+      $dumpfile("dump.vcd");
+      $dumpvars(0);
+      
+      monitor;
+      
+      clk=0;
+      forever clk=#(5) ~clk;
+    end
+  
+  initial
+    fork
+      #(13) in=1;        #(43) in=0;
+      #(57) in=1;        #(67) in=0;
+      #(77) in=1;        #(87) in=0;
+      #(97) in=1;        #(107) in=0;
+      #(300) $finish;
+    join
+  
+  task monitor;
+    $monitor($time,"in=%b,q=%d",in,q);
+  endtask
+  
+endmodule
+
+
+								             OUTPUT
+									________________
+
+# KERNEL:                    0q= 0,out7=xxxxxxx,out=xx
+# KERNEL:                    0q= 0,out7=xxxxxxx,out=xx
+# KERNEL:                    0q= 0,out7=1111110,out=7e
+# KERNEL:                    0q= 0,out7=1111110,out=7e
+# KERNEL:                    0in=x,q=  0
+# KERNEL:                   13in=1,q=  0
+# KERNEL:                   43in=0,q=  0
+# KERNEL: q=  1, q=01, q=00000001									//MAIN OUTPUT=01
+# KERNEL:                   45q= 1,out7=1111110,out=7e
+# KERNEL:                   45q= 1,out7=0110000,out=30
+# KERNEL:                   45in=0,q=  1
+# KERNEL:                   57in=1,q=  1
+# KERNEL:                   67in=0,q=  1
+# KERNEL: q=  2, q=02, q=00000010									//=02      SIMILARLY
+# KERNEL:                   75q= 2,out7=0110000,out=30
+# KERNEL:                   75q= 2,out7=1101101,out=6d
+# KERNEL:                   75in=0,q=  2
+# KERNEL:                   77in=1,q=  2
+# KERNEL:                   87in=0,q=  2
+# KERNEL: q=  3, q=03, q=00000011
+# KERNEL:                   95q= 3,out7=1101101,out=6d
+# KERNEL:                   95q= 3,out7=1111001,out=79
+# KERNEL:                   95in=0,q=  3
+# KERNEL:                   97in=1,q=  3
+# KERNEL:                  107in=0,q=  3
+# KERNEL: q=  4, q=04, q=00000100
+# KERNEL:                  115q= 4,out7=1111001,out=79
+# KERNEL:                  115q= 4,out7=0110011,out=33
+# KERNEL:                  115in=0,q=  4
+
+
+______________________________________________________________________________________________________________________________________________________________________________________
+
+
+							  DISPLAY_7_SEGMENT (RANGE==00-99)
+							__________________________________
+
+module MY_SWITCH_RELEASE_ACTION(out0,out1,q,in,clk);
+  output reg [7:0] q;
+  output reg [6:0] out1;
+  output reg [6:0] out0;
+  input in;
+  input clk;
+  reg mem;
+  
+  seven_segment_display D0(out0,q [3:0] );
+  seven_segment_display D1(out1,q [7:4] );
+  
+  initial
+    begin
+      q=0;
+      mem=0;
+    end
+  
+  always@(posedge clk)
+    begin
+      mem <= in;
+      
+      if(in==0 && mem==1)
+        begin
+          q=q+1;
+        end
+      else  
+        q=q;
+    end
+  
+  always@(*)
+    $monitor($time,"out1=%d,out0=%d",out1,out0);
+  
+endmodule
+
+module seven_segment_display(out7,q);
+  output reg [6:0] out7;
+  input [3:0] q;
+  
+  always@(*)
+    begin
+      if(q<10)
+        begin
+      case(q)
+        0: out7 <= 7'h0;
+        1: out7 <= 7'h1;
+        2: out7 <= 7'h2;
+        3: out7 <= 7'h3;
+        4: out7 <= 7'h4;
+        5: out7 <= 7'h5;
+        6: out7 <= 7'h6;
+        7: out7 <= 7'h7;
+        8: out7 <= 7'h8;
+        9: out7 <= 7'h9;
+      endcase
+        end
+      else
+        out7=out7;
+    end
+  
+endmodule
+
+
+										TESTBENCH
+									     ______________
+
+module stimulus;
+  reg in;
+  reg clk;
+  wire [7:0] q;
+  wire [6:0] out0;
+  wire [6:0] out1;
+  
+  MY_SWITCH_RELEASE_ACTION DUT(out0,out1,q,in,clk);
+  
+  initial
+    begin
+      $dumpfile("dump.vcd");
+      $dumpvars(0);
+      
+       clk=0;
+      forever clk=#(2) ~clk;
+    end
+  
+  initial
+    fork
+        in=1;
+      forever #(4) in=~in;
+    join
+  initial #(500) $finish;
+  
+endmodule
+
+										OUTPUT
+									      _________
+
+# KERNEL:                    0  out1=  0,out0=  0
+# KERNEL:                    6  out1=  0,out0=  1
+# KERNEL:                   14  out1=  0,out0=  2
+# KERNEL:                   22  out1=  0,out0=  3
+# KERNEL:                   30  out1=  0,out0=  4
+# KERNEL:                   38  out1=  0,out0=  5
+# KERNEL:                   46  out1=  0,out0=  6
+# KERNEL:                   54  out1=  0,out0=  7
+# KERNEL:                   62  out1=  0,out0=  8
+# KERNEL:                   70  out1=  0,out0=  9
+# KERNEL:                  126  out1=  1,out0=  0
+# KERNEL:                  134  out1=  1,out0=  1
+# KERNEL:                  142  out1=  1,out0=  2
+# KERNEL:                  150  out1=  1,out0=  3
+# KERNEL:                  158  out1=  1,out0=  4
+# KERNEL:                  166  out1=  1,out0=  5
+# KERNEL:                  174  out1=  1,out0=  6
+# KERNEL:                  182  out1=  1,out0=  7
+# KERNEL:                  190  out1=  1,out0=  8
+# KERNEL:                  198  out1=  1,out0=  9
+# KERNEL:                  254  out1=  2,out0=  0
+# KERNEL:                  262  out1=  2,out0=  1
+# KERNEL:                  270  out1=  2,out0=  2
+# KERNEL:                  278  out1=  2,out0=  3
+# KERNEL:                  286  out1=  2,out0=  4
+# KERNEL:                  294  out1=  2,out0=  5
+# KERNEL:                  302  out1=  2,out0=  6
+# KERNEL:                  310  out1=  2,out0=  7
+# KERNEL:                  318  out1=  2,out0=  8
+# KERNEL:                  326  out1=  2,out0=  9
+# KERNEL:                  382  out1=  3,out0=  0
+# KERNEL:                  390  out1=  3,out0=  1
+# KERNEL:                  398  out1=  3,out0=  2
+# KERNEL:                  406  out1=  3,out0=  3
+# KERNEL:                  414  out1=  3,out0=  4
+# KERNEL:                  422  out1=  3,out0=  5
+# KERNEL:                  430  out1=  3,out0=  6
+# KERNEL:                  438  out1=  3,out0=  7
+# KERNEL:                  446  out1=  3,out0=  8
+# KERNEL:                  454  out1=  3,out0=  9
+# RUNTIME: Info: RUNTIME_0068 testbench.sv (24): $finish called.
